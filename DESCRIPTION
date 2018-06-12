@@ -1,6 +1,6 @@
 Package: pseudorank
 Title: Pseudo-Ranks
-Version: 0.1.0
+Version: 0.2.0
 Date: 2018-06-08
 Authors@R: c(person("Martin Happ", role = c("aut", "cre"),
                       email = "martin.happ@aon.at",
@@ -14,14 +14,17 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.4.0)
-Imports: Rcpp (>= 0.12.16)
+Imports: Rcpp (>= 0.12.16), doBy
 LinkingTo: Rcpp
+URL: http://github.com/happma/pseudorank
+BugReports: http://github.com/happma/pseudorank/issues
 RoxygenNote: 6.0.1
+Suggests: testthat
 NeedsCompilation: yes
-Packaged: 2018-06-10 06:48:39 UTC; Martin
+Packaged: 2018-06-12 11:04:22 UTC; Martin
 Author: Martin Happ [aut, cre] (<https://orcid.org/0000-0003-0009-2665>),
   Georg Zimmermann [aut],
   Arne C. Bathke [aut],
   Edgar Brunner [aut]
 Repository: CRAN
-Date/Publication: 2018-06-10 14:32:56 UTC
+Date/Publication: 2018-06-12 13:45:49 UTC
