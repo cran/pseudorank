@@ -6,26 +6,34 @@
 \alias{psrank.formula}
 \title{Calculation of Pseudo-Ranks}
 \usage{
-psrank(data, ...)
+psrank(x, ...)
 
-\method{psrank}{numeric}(data, group, ...)
+\method{psrank}{numeric}(x, y, na.last = NA, ties.method = c("average",
+  "max", "min"), ...)
 
-\method{psrank}{formula}(formula, data, ...)
+\method{psrank}{formula}(formula, data, na.last = NA,
+  ties.method = c("average", "max", "min"), ...)
 }
 \arguments{
-\item{data}{numerical vector or data.frame}
+\item{x}{vector containing the observations}
 
 \item{...}{further arguments}
 
-\item{group}{vector coding for the groups}
+\item{y}{vector specifiying the group to which the observations from the x vector belong to}
+
+\item{na.last}{for controlling the treatment of NAs. If TRUE, missing values in the data are put last; if FALSE, they are put first; if NA, they are removed (recommended).}
+
+\item{ties.method}{type of pseudo-ranks: either 'average' (recommended), 'min' or 'max'.}
 
 \item{formula}{formula object}
+
+\item{data}{data.frame containing the variables in the formula (observations and group)}
 }
 \value{
-Returns a numerical vector containing the pseudo-ranks
+Returns a numerical vector containing the pseudo-ranks.
 }
 \description{
-Calculation of (mid) pseudo-ranks of a sample. In case of ties (i.e. equal values), the average of min pseudo-rank and max-pseudor-rank are taken (similar to rank with ties.method="average").
+Calculation of (mid) pseudo-ranks of a sample. In case of ties (i.e. equal values), the average of min pseudo-ranks and max-pseudo-ranks are taken (similar to rank with ties.method="average").
 }
 \examples{
 df <- data.frame(data = round(rnorm(100)), group = c(rep(1,40),rep(2,40),rep(3,20)))
@@ -39,8 +47,5 @@ psrank(df$data,df$group)
 # Variant 2: use a formula object, Note that only one group factor can be used
 # that is, in data~group*group2 only 'group' will be used
 psrank(data~group,df)
-}
-\seealso{
-\code{\link{rank}}.
 }
 \keyword{export}

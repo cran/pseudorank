@@ -3,16 +3,27 @@ using namespace Rcpp;
 
 
 // [[Rcpp::export]]
-Rcpp::NumericVector psrank(Rcpp::NumericVector &data, Rcpp::NumericVector &group, Rcpp::NumericVector &n) {
+Rcpp::NumericVector order_vec(Rcpp::NumericVector& data) {
+  Rcpp::NumericVector y(data.size());
+  std::iota(y.begin(), y.end(), 0);
+  auto comparator = [&data] (int a, int b) { return data[a] < data[b]; }; 
+  std::sort(y.begin(), y.end(), comparator);
   
+  return y;
+}
+
+
+// [[Rcpp::export]]
+Rcpp::NumericVector psrankCpp(Rcpp::NumericVector &data, Rcpp::NumericVector &group, Rcpp::NumericVector &n) {
+
   double N = data.size();
   double ngroups = n.size();
   Rcpp::NumericVector result(N);
   Rcpp::NumericVector result_ties(N);
   
+  
   // Calculate the first pseudo-rank
-  int index = group[0];
-  result[0] = N/ngroups*1/n[index-1]*1/2 + 0.5;
+  result[0] = N/ngroups*1/n[group[0]-1]*1/2 + 0.5;
   
   // define the matrix for the differences between the pseudo-ranks
   NumericMatrix delta(ngroups, ngroups);
@@ -23,31 +34,26 @@ Rcpp::NumericVector psrank(Rcpp::NumericVector &data, Rcpp::NumericVector &group
     }
   }
   
-  int i1 = 0;
-  int i2 = 0;
   
   // Case: no ties
   for(int i = 1; i < N; i++){
-    i1 = group[i]-1;
-    i2 = group[i-1]-1;
-    result[i] = result[i-1] + delta(i1, i2);       
+    result[i] = result[i-1] + delta(group[i]-1, group[i-1]-1);       
   }
   
   double add = 0;
   int j = 0;
-  //result_ties = clone(result);
+  int i = 0;
+  result_ties = clone(result);
   
   // Case: ties in the data
-  for(int i = 0; i < N; i++){
-    result_ties[i] = result[i];
+  while(i < N - 1){
     
     if(data[i] == data[i+1]) {
       add = 0;
       j = i + 1;
       // sum up the incremental factor for ties
       while(data[i] == data[j]){
-        index = group[j];
-        add += 1/n[index-1];
+        add += 1/n[group[j]-1];
         j++;
         if(j == N) {
           break;
@@ -56,9 +62,7 @@ Rcpp::NumericVector psrank(Rcpp::NumericVector &data, Rcpp::NumericVector &group
       for(int k = i; k < j; k++){
         // we need to distinguish between i > 0 and i == 0, otherwise result[i-1] not defined
         if(i > 0) {
-          i1 = group[i]-1;
-          i2 = group[i-1]-1;
-          result_ties[k] = result[i-1] + delta(i1, i2) + N/ngroups*0.5*add; // 'mid'-pseudo-ranks
+          result_ties[k] = result[i-1] + delta(group[i]-1, group[i-1]-1) + N/ngroups*0.5*add; // 'mid'-pseudo-ranks
         }
         else {
           result_ties[k] = result[0] +  N/ngroups*0.5*add; // 'mid'-pseudo-ranks
@@ -66,13 +70,137 @@ Rcpp::NumericVector psrank(Rcpp::NumericVector &data, Rcpp::NumericVector &group
       }
       // resume for loop where last block of ties ended
       i = j-1;
-      if(i == N - 1) {
-        break;
-      }
-    }
+    } // end if
+    i++;
   }
   
   
   return result_ties;
 }
 
+// [[Rcpp::export]]
+Rcpp::NumericVector psrankMinCpp(Rcpp::NumericVector &data, Rcpp::NumericVector &group, Rcpp::NumericVector &n) {
+  
+  double N = data.size();
+  double ngroups = n.size();
+  Rcpp::NumericVector result(N);
+  Rcpp::NumericVector result_ties(N);
+  
+  
+  // Calculate the first pseudo-rank
+  result[0] = 1;
+  
+  // define the matrix for the differences between the pseudo-ranks
+  NumericMatrix delta(ngroups, ngroups);
+  for(int i = 0; i < ngroups; i++){
+    for(int j = i; j < ngroups; j++){
+      delta(i,j) = N/ngroups*(1/n[i]);
+      delta(j,i) = N/ngroups*(1/n[j]);
+    }
+  }
+  
+  
+  // Case: no ties
+  for(int i = 1; i < N; i++){
+    result[i] = result[i-1] + delta(group[i-1]-1, group[i]-1);       
+  }
+
+  double add = 0;
+  int j = 0;
+  int i = 0;
+  result_ties = clone(result);
+  
+  // Case: ties in the data
+  while(i < N - 1){
+    
+    if(data[i] == data[i+1]) {
+      add = 1/n[group[i]-1];
+      j = i + 1;
+      // sum up the incremental factor for ties
+      while(data[i] == data[j]){
+        add += 1/n[group[j]-1];
+        j++;
+        if(j == N) {
+          break;
+        }
+      }
+      for(int k = i+1; k < j; k++){
+        // we need to distinguish between i > 0 and i == 0, otherwise result[i-1] not defined
+          result_ties[k] = result[i];
+      }
+      result_ties[j] = result[i] + N/ngroups*add;
+      // resume for loop where last block of ties ended
+      i = j-1;
+    } // end if
+    i++;
+  }
+  
+  
+  return result_ties;
+}
+
+
+
+// [[Rcpp::export]]
+Rcpp::NumericVector psrankMaxCpp(Rcpp::NumericVector &data, Rcpp::NumericVector &group, Rcpp::NumericVector &n) {
+  
+  double N = data.size();
+  double ngroups = n.size();
+  Rcpp::NumericVector result(N);
+  Rcpp::NumericVector result_ties(N);
+  
+  
+  // Calculate the first pseudo-rank
+  result[0] = N/ngroups*1/n[0];
+
+  // define the matrix for the differences between the pseudo-ranks
+  NumericMatrix delta(ngroups, ngroups);
+  for(int i = 0; i < ngroups; i++){
+    for(int j = i; j < ngroups; j++){
+      delta(i,j) = N/ngroups*(1/n[j]);
+      delta(j,i) = N/ngroups*(1/n[i]);
+    }
+  }
+  
+  
+  // Case: no ties
+  for(int i = 1; i < N; i++){
+    result[i] = result[i-1] + delta(group[i-1]-1, group[i]-1);       
+  }
+
+  double add = 0;
+  int j = 0;
+  int i = 0;
+  result_ties = clone(result);
+  
+  // Case: ties in the data
+  while(i < N - 1){
+    
+    if(data[i] == data[i+1]) {
+      add = 1/n[group[i]-1];
+      j = i + 1;
+      // sum up the incremental factor for ties
+      while(data[i] == data[j]){
+        add += 1/n[group[j]-1];
+        j++;
+        if(j == N) {
+          break;
+        }
+      }
+      for(int k = i; k < j; k++){
+        // we need to distinguish between i > 0 and i == 0, otherwise result[i-1] not defined
+        if(i == 0) {
+          result_ties[k] = N/ngroups*add;
+        } else {
+          result_ties[k] = result_ties[i-1] + N/ngroups*add;
+        }
+      }
+      // resume for loop where last block of ties ended
+      i = j-1;
+    } // end if
+    i++;
+  }
+  
+  
+  return result_ties;
+}

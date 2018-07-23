@@ -5,31 +5,51 @@
 ################################################################################
 
 
-#globalVariables("_pseudoranks_psrank")
-
 #' Calculation of Pseudo-Ranks
 #'
 #' @description Calculation of (mid) pseudo-ranks of a sample. In case of ties (i.e. equal values), the average of min pseudo-rank and max-pseudor-rank are taken (similar to rank with ties.method="average").
 #' @param data numerical vector
 #' @param group vector coding for the groups
 #' @return Returns a numerical vector containing the pseudo-ranks
-#' @seealso \code{\link{rank}}.
 #' @keywords internal
-recursiveCalculation <- function(data, group) {
+recursiveCalculation <- function(data, group, na.last, ties.method) {
 
   stopifnot(is.numeric(data), is.factor(group))
-  group <- as.numeric(group)
-  n <- as.numeric(as.matrix(table(group)))
+  n <- table(group)
+  
 
-  if( identical(n,rep(n[1],length(n)))  ) {
-    return(rank(data, ties.method = "average"))
+ # case: missing values in the data
+ if(sum(is.na(data)) > 0) {
+   nas <- which(is.na(data))
+    
+   # variant 1: remove NAs
+   if(is.na(na.last)) {
+     data <- data[-nas]
+     group <- droplevels(group[-nas])
+     # group sizes need to be adjusted because NAs were removed
+     n <- table(group)
+   }
+   # variant 2: keep NAs and put them last
+   else if(na.last == TRUE) {
+     m <- max(data, na.rm = TRUE)
+     data[nas] <- (m+1):(m+length(nas))
+   }
+   # variant 3: keep NAs and put them first
+   else if(na.last == FALSE) {
+     m <- min(data, na.rm = TRUE)
+     data[nas] <- (m-1):(m-length(nas))
+   } 
+  }
+    
+  ord <- .Call(`_pseudorank_order_vec`, data) + 1
+  data_sorted <- data[ord]
+  sortback <- match(data, data_sorted)
+  if(ties.method == "average") {
+    return(.Call(`_pseudorank_psrankCpp`, data_sorted, group[ord], n)[sortback])
+  } else if(ties.method == "min") {
+    return(.Call(`_pseudorank_psrankMinCpp`, data_sorted, group[ord], n)[sortback])
   } else {
-    id <- 1:length(data)
-    df <- matrix(c(data = data, group = group, id = id), ncol=3)
-    df <- df[order(df[, 1]),]
-    prank <- .Call(`_pseudorank_psrank`, df[, 1], df[, 2], n)
-    sortback <- match(id, df[, 3])
-    return(prank[sortback])
+    return(.Call(`_pseudorank_psrankMaxCpp`, data_sorted, group[ord], n)[sortback])
   }
 }
 
@@ -38,26 +58,35 @@ recursiveCalculation <- function(data, group) {
 ## ----------------------------------
 # pairwise <- function(data, group, n){
 #   group <- factor(group, labels = 1:length(n))
-#   df <- data.frame(data = data, group = group, id = 1:sum(n))
-#   g <- levels(group)
-#   df$group <- factor(df$group, labels = 1:length(n))
+#   df <- data.table(data = data, group = group, id = 1:sum(n))
+#   a <- length(n)
+#   
+#   df$group <- factor(df$group, labels = 1:a)
 #   df$group <- as.numeric(df$group)
 #   prank <- rep(0, length(data))
-#   for(i in 1:length(n)) {
-#     iset <- subset(df, df$group == i)$data
-#     internal <- rank(iset, ties.method = "average")
-#     for(j in 1:n[i]) {
-#       prank[cumsum(c(0,n))[i]+j] <- (internal[j]-1/2)*1/n[i]
-#       for(k in setdiff(1:length(n),i)) {
-#         pset <- subset(df, df$group==i | df$group == k)$data
-#         index <- which(pset == iset[j])
-#         prank[cumsum(c(0,n))[i]+j] <- 1/n[k]*(rank(pset, ties.method = "average")[index] - internal[j]) + prank[cumsum(c(0,n))[i]+j] 
-#       }
-#       prank[cumsum(c(0,n))[i]+j] <- prank[cumsum(c(0,n))[i]+j]*sum(n)/length(n) + 1/2
+#   
+#   L <- list(as.matrix(diag(a), ncol = a))
+#   tmp <- df
+#   
+#   for(i in 1:a) {
+#     L[[i]] <- as.matrix(diag(sum(n)), ncol = sum(n))*0
+#     for(j in 1:a) {
+#       tmp <- copy(df)
+#       tmp[group %in% c(i,j), data:=rank(data, ties.method = "average")] 
+#       L[[i]][, j] <- copy(tmp[, data])
 #     }
 #   }
+#   
+#   for(i in 1:sum(n)) {
+#     g <- df$group[i]
+#     prank[i] <- 1/n[g]*(L[[g]][i, g]-1/2)
+#     for(j in 1:a) {
+#       prank[i] <- prank[i]+1/n[j]*(L[[j]][i, g] - L[[g]][i, g])
+#     }
+#   }
+#   prank <- prank*sum(n)/a+1/2
 #   return(prank)
-# }
+# } 
 # 
 # 
 # AB <- function(data, group){
