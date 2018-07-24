@@ -1,4 +1,4 @@
-9ad816b7e83fbafcf1495682bdbd2f5c *DESCRIPTION
+d478ca6eeb82e14d80cdc20da21cb3d9 *DESCRIPTION
 430b4c2491ef89e4249982e3db8107c4 *NAMESPACE
 2911dc6dcd1c9d723476b3e70ea8613f *R/RcppExports.R
 1e8c6ecd743b1a51626e65706676e665 *R/S3method.R
@@ -12,7 +12,7 @@ e6625d7fd70eaa9aa3284058a6280551 *man/psrank.Rd
 4a5ddb3b42c75646f1327b1dabc2c486 *man/recursiveCalculation.Rd
 e3d3cb360fbfdb3c6974e14eb5f09870 *src/Makevars.in
 1d442b55a4865e09d2214a2f0819673f *src/RcppExports.cpp
-5c4ed26549bc94caaed3cc6910da3239 *src/pseudorank.cpp
+248dff25eb1904800ecd03d0e6d041dc *src/pseudorank.cpp
 072338af3557198dd630323f4b6fd243 *tests/testthat.R
 f6ba84a299364d92e9844e37c61f4f90 *tests/testthat/test.R
 1fb143b31a88f00c0be2ab04e8429136 *tests/testthat/test_hettmansperger.R
