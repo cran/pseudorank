@@ -3,7 +3,9 @@
 [![CRANstatus](https://www.r-pkg.org/badges/version/pseudorank)](https://cran.r-project.org/package=pseudorank)
 [![](https://cranlogs.r-pkg.org/badges/pseudorank)](https://cran.r-project.org/package=pseudorank)
 [![Travis-CI Build Status](https://travis-ci.org/happma/pseudorank.svg?branch=master)](https://travis-ci.org/happma/pseudorank)
+[![Build status](https://ci.appveyor.com/api/projects/status/queq8aa7cpct3j16?svg=true)](https://ci.appveyor.com/project/happma/pseudorank)
 [![codecov](https://codecov.io/gh/happma/pseudorank/branch/master/graph/badge.svg)](https://codecov.io/gh/happma/pseudorank)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/014857185eaf4387ad83f5d7509d059a)](https://www.codacy.com/project/happma/pseudorank/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=happma/pseudorank&amp;utm_campaign=Badge_Grade_Dashboard)
 
 This R package provides a function written in C++ to calculate pseudo-ranks in R and the Hettmansperger-Norton test with pseudo-ranks instead of ranks.
 For a definition and discussion of pseudo-ranks, see for example 
@@ -102,3 +104,7 @@ hettmansperger_norton_test(df$data, df$group, alternative="increasing")
 hettmansperger_norton_test(df$data, df$group, alternative="custom", trend = c(1, 3, 2))
 
 ```
+
+## Kruskal-Wallis Test with Pseudo-Ranks
+
+The Kruskal-Wallis test implemented in this package can use pseudo-ranks, if the argument 'pseudoranks = TRUE' is used.

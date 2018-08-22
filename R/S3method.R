@@ -56,6 +56,7 @@ psrank.formula <- function(formula, data, na.last = NA, ties.method = c("average
 #' @param na.rm a logical value indicating if NA values should be removed
 #' @param alternative either decreasing (trend k, k-1, ..., 1) or increasing (1, 2, ..., k) or custom (then argument trend must be specified)
 #' @param trend custom numeric vector indicating the trend for the custom alternative, only used if alternative = "custom"
+#' @param pseudoranks logical value indicating if pseudo-ranks or ranks should be used
 #' @param ... further arguments are ignored
 #' @return Returns an object.
 #' @example R/example_2.txt
@@ -69,15 +70,108 @@ hettmansperger_norton_test <- function(x, ...) {
 #' @method hettmansperger_norton_test numeric
 #' @rdname hettmansperger_norton_test
 #' @keywords export
-hettmansperger_norton_test.numeric <- function(x, y, na.rm = FALSE, alternative = c("decreasing", "increasing", "custom"), trend = NULL, ...) {
-  return(hettmansperger_norton_test_internal(x, y, na.rm, alternative = alternative, formula = NULL, trend = trend, ...))
+hettmansperger_norton_test.numeric <- function(x, y, na.rm = FALSE, alternative = c("decreasing", "increasing", "custom"), trend = NULL, pseudoranks = TRUE, ...) {
+  return(hettmansperger_norton_test_internal(x, y, na.rm, alternative = alternative, formula = NULL, trend = trend, pseudoranks = pseudoranks, ...))
 }
 
 #' @method hettmansperger_norton_test formula
 #' @rdname hettmansperger_norton_test
 #' @keywords export
-hettmansperger_norton_test.formula <- function(formula, data, na.rm = FALSE, alternative = c("decreasing", "increasing", "custom"), trend = NULL, ...) {
-  model <- model.frame(formula, data = data)
+hettmansperger_norton_test.formula <- function(formula, data, na.rm = FALSE, alternative = c("decreasing", "increasing", "custom"), trend = NULL, pseudoranks = TRUE, ...) {
+  model <- model.frame(formula, data = data, na.action = NULL)
   colnames(model) <- c("data", "group")
-  return(hettmansperger_norton_test_internal(model$data, model$group, na.rm, alternative = alternative, formula = formula, trend = trend, ...))
+  return(hettmansperger_norton_test_internal(model$data, model$group, na.rm, alternative = alternative, formula = formula, trend = trend, pseudoranks = pseudoranks, ...))
 }
+
+
+
+
+
+
+
+#' Hettmansperger-Norton Trend Test for k-Samples
+#'
+#' @description This function calculates the Hettmansperger-Norton trend test using pseudo-ranks under the null hypothesis H0F: F_1 = ... F_k = 0.
+#' @rdname kruskal_wallis_test
+#' @param x numeric vector containing the data
+#' @param grp factor specifying the groups
+#' @param na.rm a logical value indicating if NA values should be removed
+#' @param formula optional formula object
+#' @param data optional data.frame of the data
+#' @param pseudoranks logical value indicating if pseudo-ranks or ranks should be used
+#' @param ... further arguments are ignored
+#' @return Returns an object of class 'pseudorank'
+#' @example R/example_3.txt
+#' @references Brunner, E., Bathke A. C. and Konietschke, F. Rank- and Pseudo-Rank Procedures in Factorial Designs - Using R and SAS. Springer Verlag. to appear.
+#' @keywords export
+kruskal_wallis_test <- function(x, ...) {
+  UseMethod("kruskal_wallis_test")
+}
+
+#' @method kruskal_wallis_test numeric
+#' @rdname kruskal_wallis_test
+#' @keywords export
+kruskal_wallis_test.numeric <- function(x, grp, na.rm = FALSE, pseudoranks = TRUE, ...) {
+  return(kruskal_wallis_internal(data=x, group=grp, na.rm = na.rm, pseudoranks = pseudoranks, formula = NULL, ...))
+}
+
+#' @method kruskal_wallis_test formula
+#' @rdname kruskal_wallis_test
+#' @keywords export
+kruskal_wallis_test.formula <- function(formula, data, na.rm = FALSE, pseudoranks = TRUE, ...) {
+  model <- model.frame(formula, data = data, na.action = NULL)
+  colnames(model) <- c("data", "group")
+  return(kruskal_wallis_internal(model$data, as.factor(model$group), na.rm = na.rm, formula = formula, pseudoranks = pseudoranks, ...))
+}
+
+
+#' @keywords export
+print.pseudorank <- function(x, ...) {
+  cat(x$name)
+  cat("\n","\n")
+  if(!is.null(x$formula)) {
+    cat("Call:", "\n")
+    print(x$formula)
+    cat("\n")
+  }
+  if(!is.null(x$alternative)){
+    cat("Alternative: ", x$alternative, "\n")
+    if(x$alternative == "custom") {
+      cat("Trend: ", x$trend, "\n")
+    }
+  }
+  cat("Test Statistic: ", x$test, "\n")
+  cat("unweighted relative Effects / Pseudo-ranks: ", x$pseudoranks)
+  cat("\n")
+  cat("p-Value: ", x$pValue, "\n")
+  cat("\n")
+  cat("Descriptive:\n")
+  df <- data.frame(n = x$ss, p = x$pHat)
+  print(df, row.names = FALSE)
+}
+
+#' @keywords export
+summary.pseudorank <- function(object, ...) {
+  cat(object$name)
+  cat("\n", "\n")
+  if(!is.null(object$formula)) {
+    cat("Call:", "\n")
+    print(object$formula)
+    cat("\n")
+  }
+  if(!is.null(object$alternative)){
+    cat("Alternative: ", object$alternative, "\n")
+    if(object$alternative == "custom") {
+      cat("Trend: ", object$trend, "\n")
+    }
+  }
+  cat("Test Statistic: ", object$test, "\n")
+  cat("unweighted relative Effects / Pseudo-ranks: ", object$pseudoranks)
+  cat("\n")
+  cat("p-Value: ", object$pValue, "\n")
+  cat("\n")
+  cat("Descriptive:\n")
+  df <- data.frame(n = object$ss, p = object$pHat)
+  print(df, row.names = FALSE)
+}
+

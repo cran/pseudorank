@@ -1,7 +1,7 @@
 Package: pseudorank
 Title: Pseudo-Ranks
-Version: 0.2.6
-Date: 2018-07-24
+Version: 0.3.0
+Date: 2018-08-21
 Authors@R: c(person("Martin Happ", role = c("aut", "cre"),
                       email = "martin.happ@aon.at",
                       comment = c(ORCID = "0000-0003-0009-2665")),
@@ -22,10 +22,10 @@ BugReports: http://github.com/happma/pseudorank/issues
 RoxygenNote: 6.0.1
 Suggests: testthat
 NeedsCompilation: yes
-Packaged: 2018-07-24 07:27:20 UTC; Martin
+Packaged: 2018-08-21 19:27:41 UTC; Martin
 Author: Martin Happ [aut, cre] (<https://orcid.org/0000-0003-0009-2665>),
   Georg Zimmermann [aut],
   Arne C. Bathke [aut],
   Edgar Brunner [aut]
 Repository: CRAN
-Date/Publication: 2018-07-24 09:00:03 UTC
+Date/Publication: 2018-08-22 04:50:09 UTC
