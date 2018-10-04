@@ -11,7 +11,7 @@ J <- function(d) {
 
 #' Hettmansperger-Norton Trend Test for k-Samples
 #'
-#' @description This function calculates the Hettmansperger-Norton trend test using pseudo-ranks under the null hypothesis H0F: F_1 = ... F_k = 0.
+#' @description This function calculates the Hettmansperger-Norton trend test using pseudo-ranks under the null hypothesis H0F: F_1 = ... F_k.
 #' @param data numeric vector containing the data
 #' @param group ordered factor vector for the groups
 #' @param alternative either decreasing or increasing
@@ -21,7 +21,7 @@ J <- function(d) {
 #' @param ... further arguments are ignored
 #' @return Returns a data.frame with the results
 #' @example R/example_2.txt
-#' @references Brunner, E., Bathke A. C. and Konietschke, F. Rank- and Pseudo-Rank Procedures in Factorial Designs - Using R and SAS. Springer Verlag. to appear.
+#' @references Brunner, E., Bathke, A.C., and Konietschke, F. (2018a). Rank- and Pseudo-Rank Procedures for Independent Observations in Factorial Designs - Using R and SAS. Springer Series in Statistics, Springer, Heidelberg. ISBN: 978-3-030-02912-8.
 #' @references Hettmansperger, T. P., & Norton, R. M. (1987). Tests for patterned alternatives in k-sample problems. Journal of the American Statistical Association, 82(397), 292-299
 #' @keywords internal
 hettmansperger_norton_test_internal <- function(data, group, na.rm, alternative = c("decreasing", "increasing", "custom"), formula = NULL, trend = NULL, pseudoranks = TRUE, ...) {
@@ -47,7 +47,7 @@ hettmansperger_norton_test_internal <- function(data, group, na.rm, alternative 
   if(!pseudoranks) {
     df <- data.frame(pranks = rank(data), group = group)
   } else {
-    df <- data.frame(pranks = psrank.numeric(data, group), group = group)
+    df <- data.frame(pranks = pseudorank.numeric(data, group), group = group)
   }
   
   df <- df[order(df$group),]
@@ -79,6 +79,8 @@ hettmansperger_norton_test_internal <- function(data, group, na.rm, alternative 
   output <- list()
   output$name <- "Hettmansperger-Norton Trend Test"
   output$test <- test
+  output$distribution <- "Standard-Normal"
+  output$df <- NULL
   output$pValue <- pValue
   output$ss <- n
   output$pHat <- pHat

@@ -2,32 +2,14 @@
 % Please edit documentation in R/S3method.R
 \name{psrank}
 \alias{psrank}
-\alias{psrank.numeric}
-\alias{psrank.formula}
-\title{Calculation of Pseudo-Ranks}
+\title{Calculation of Pseudo-Ranks (Deprecated)}
 \usage{
 psrank(x, ...)
-
-\method{psrank}{numeric}(x, y, na.last = NA, ties.method = c("average",
-  "max", "min"), ...)
-
-\method{psrank}{formula}(formula, data, na.last = NA,
-  ties.method = c("average", "max", "min"), ...)
 }
 \arguments{
 \item{x}{vector containing the observations}
 
-\item{...}{further arguments}
-
-\item{y}{vector specifiying the group to which the observations from the x vector belong to}
-
-\item{na.last}{for controlling the treatment of NAs. If TRUE, missing values in the data are put last; if FALSE, they are put first; if NA, they are removed (recommended).}
-
-\item{ties.method}{type of pseudo-ranks: either 'average' (recommended), 'min' or 'max'.}
-
-\item{formula}{formula object}
-
-\item{data}{data.frame containing the variables in the formula (observations and group)}
+\item{...}{further arguments (see help for pseudorank)}
 }
 \value{
 Returns a numerical vector containing the pseudo-ranks.
@@ -42,10 +24,10 @@ df$group <- as.factor(df$group)
 ## two ways to calculate pseudo-ranks
 
 # Variant 1: use a vector for the data and a group vector
-psrank(df$data,df$group)
+pseudorank(df$data,df$group)
 
 # Variant 2: use a formula object, Note that only one group factor can be used
 # that is, in data~group*group2 only 'group' will be used
-psrank(data~group,df)
+pseudorank(data~group,df)
 }
 \keyword{export}

@@ -24,7 +24,7 @@ kruskal_wallis_internal(data, group, na.rm, formula = NULL,
 Returns a data.frame with the results
 }
 \description{
-This function calculates the Hettmansperger-Norton trend test using pseudo-ranks under the null hypothesis H0F: F_1 = ... F_k = 0.
+This function calculates the Kruskal-Wallis test using pseudo-ranks under the null hypothesis H0F: F_1 = ... F_k.
 }
 \examples{
 x = c(1, 1, 1, 1, 2, 3, 4, 5, 6)
@@ -34,7 +34,7 @@ grp = as.factor(c('A','A','B','B','B','D','D','D','D'))
 kruskal_wallis_test(x, grp, na.rm = FALSE, pseudoranks = TRUE)
 }
 \references{
-Brunner, E., Bathke A. C. and Konietschke, F. Rank- and Pseudo-Rank Procedures in Factorial Designs - Using R and SAS. Springer Verlag. to appear.
+Brunner, E., Bathke, A.C., and Konietschke, F. (2018a). Rank- and Pseudo-Rank Procedures for Independent Observations in Factorial Designs - Using R and SAS. Springer Series in Statistics, Springer, Heidelberg. ISBN: 978-3-030-02912-8.
 
 Hettmansperger, T. P., & Norton, R. M. (1987). Tests for patterned alternatives in k-sample problems. Journal of the American Statistical Association, 82(397), 292-299
 }

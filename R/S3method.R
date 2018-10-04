@@ -18,36 +18,52 @@
 #' @param ties.method type of pseudo-ranks: either 'average' (recommended), 'min' or 'max'.
 #' @param ... further arguments
 #' @return Returns a numerical vector containing the pseudo-ranks.
-#' @rdname psrank
+#' @rdname pseudorank
+#' @references Brunner, E., Bathke, A.C., and Konietschke, F. (2018a). Rank- and Pseudo-Rank Procedures for Independent Observations in Factorial Designs - Using R and SAS. Springer Series in Statistics, Springer, Heidelberg. ISBN: 978-3-030-02912-8.
 #' @example R/example_1.txt
 #' @keywords export
-psrank <- function(x, ...){
-  UseMethod("psrank")
+pseudorank <- function(x, ...){
+  UseMethod("pseudorank")
 }
 
-#' @method psrank numeric
-#' @rdname psrank
+#' @method pseudorank numeric
+#' @rdname pseudorank
 #' @keywords export
-psrank.numeric <- function(x, y, na.last = NA, ties.method = c("average", "max", "min"), ...){
+pseudorank.numeric <- function(x, y, na.last = NA, ties.method = c("average", "max", "min"), ...){
   stopifnot(na.last %in% c(TRUE, FALSE, NA))
   ties.method = match.arg(ties.method)
   recursiveCalculation(x, y, na.last, ties.method)
 }
 
-#' @method psrank formula
-#' @rdname psrank
+#' @method pseudorank formula
+#' @rdname pseudorank
 #' @keywords export
-psrank.formula <- function(formula, data, na.last = NA, ties.method = c("average", "max", "min"), ...){
+pseudorank.formula <- function(formula, data, na.last = NA, ties.method = c("average", "max", "min"), ...){
   stopifnot(na.last %in% c(TRUE, FALSE, NA))
   ties.method = match.arg(ties.method)
   df <- model.frame(formula, data, na.action = NULL)
   recursiveCalculation(df[, 1], df[, 2], na.last, ties.method)
 }
 
+#' Calculation of Pseudo-Ranks (Deprecated)
+#'
+#' @description Calculation of (mid) pseudo-ranks of a sample. In case of ties (i.e. equal values), the average of min pseudo-ranks and max-pseudo-ranks are taken (similar to rank with ties.method="average").
+#' @param x vector containing the observations
+#' @param ... further arguments (see help for pseudorank)
+#' @return Returns a numerical vector containing the pseudo-ranks.
+#' @rdname psrank-deprecated
+#' @example R/example_1.txt
+#' @keywords export
+psrank <- function(x, ...) {
+  .Deprecated("pseudorank", package=NULL,
+              old = as.character(sys.call(sys.parent()))[1L])
+  UseMethod("pseudorank")
+}
+
 
 #' Hettmansperger-Norton Trend Test for k-Samples
 #'
-#' @description This function calculates the Hettmansperger-Norton trend test using pseudo-ranks under the null hypothesis H0F: F_1 = ... F_k = 0.
+#' @description This function calculates the Hettmansperger-Norton trend test using pseudo-ranks under the null hypothesis H0F: F_1 = ... F_k.
 #' @rdname hettmansperger_norton_test
 #' @param x vector containing the observations
 #' @param y vector specifiying the group to which the observations from the x vector belong to
@@ -60,7 +76,7 @@ psrank.formula <- function(formula, data, na.last = NA, ties.method = c("average
 #' @param ... further arguments are ignored
 #' @return Returns an object.
 #' @example R/example_2.txt
-#' @references Brunner, E., Bathke A. C. and Konietschke, F. Rank- and Pseudo-Rank Procedures in Factorial Designs - Using R and SAS. Springer Verlag. to appear.
+#' @references Brunner, E., Bathke, A.C., and Konietschke, F. (2018a). Rank- and Pseudo-Rank Procedures for Independent Observations in Factorial Designs - Using R and SAS. Springer Series in Statistics, Springer, Heidelberg. ISBN: 978-3-030-02912-8.
 #' @references Hettmansperger, T. P., & Norton, R. M. (1987). Tests for patterned alternatives in k-sample problems. Journal of the American Statistical Association, 82(397), 292-299
 #' @keywords export
 hettmansperger_norton_test <- function(x, ...) {
@@ -71,6 +87,7 @@ hettmansperger_norton_test <- function(x, ...) {
 #' @rdname hettmansperger_norton_test
 #' @keywords export
 hettmansperger_norton_test.numeric <- function(x, y, na.rm = FALSE, alternative = c("decreasing", "increasing", "custom"), trend = NULL, pseudoranks = TRUE, ...) {
+  alternative = match.arg(alternative)
   return(hettmansperger_norton_test_internal(x, y, na.rm, alternative = alternative, formula = NULL, trend = trend, pseudoranks = pseudoranks, ...))
 }
 
@@ -78,6 +95,7 @@ hettmansperger_norton_test.numeric <- function(x, y, na.rm = FALSE, alternative 
 #' @rdname hettmansperger_norton_test
 #' @keywords export
 hettmansperger_norton_test.formula <- function(formula, data, na.rm = FALSE, alternative = c("decreasing", "increasing", "custom"), trend = NULL, pseudoranks = TRUE, ...) {
+  alternative = match.arg(alternative)
   model <- model.frame(formula, data = data, na.action = NULL)
   colnames(model) <- c("data", "group")
   return(hettmansperger_norton_test_internal(model$data, model$group, na.rm, alternative = alternative, formula = formula, trend = trend, pseudoranks = pseudoranks, ...))
@@ -89,9 +107,9 @@ hettmansperger_norton_test.formula <- function(formula, data, na.rm = FALSE, alt
 
 
 
-#' Hettmansperger-Norton Trend Test for k-Samples
+#' Kruskal-Wallis Test
 #'
-#' @description This function calculates the Hettmansperger-Norton trend test using pseudo-ranks under the null hypothesis H0F: F_1 = ... F_k = 0.
+#' @description This function calculates the Kruskal-Wallis test using pseudo-ranks under the null hypothesis H0F: F_1 = ... F_k.
 #' @rdname kruskal_wallis_test
 #' @param x numeric vector containing the data
 #' @param grp factor specifying the groups
@@ -102,7 +120,7 @@ hettmansperger_norton_test.formula <- function(formula, data, na.rm = FALSE, alt
 #' @param ... further arguments are ignored
 #' @return Returns an object of class 'pseudorank'
 #' @example R/example_3.txt
-#' @references Brunner, E., Bathke A. C. and Konietschke, F. Rank- and Pseudo-Rank Procedures in Factorial Designs - Using R and SAS. Springer Verlag. to appear.
+#' @references Brunner, E., Bathke, A.C., and Konietschke, F. (2018a). Rank- and Pseudo-Rank Procedures for Independent Observations in Factorial Designs - Using R and SAS. Springer Series in Statistics, Springer, Heidelberg. ISBN: 978-3-030-02912-8.
 #' @keywords export
 kruskal_wallis_test <- function(x, ...) {
   UseMethod("kruskal_wallis_test")
@@ -125,6 +143,53 @@ kruskal_wallis_test.formula <- function(formula, data, na.rm = FALSE, pseudorank
 }
 
 
+
+
+
+#' Kepner-Robinson Test
+#'
+#' @description This function calculates the Kepner-Robinson test using ranks under the null hypothesis H0F: F_1 = ... F_k where F_i are the marginal distributions. Each subject needs to have k measurements. This test assumes that the covariance matrix of a subject has a compound symmetry structure.
+#' @rdname kepner_robinson_test
+#' @param x numeric vector containing the data
+#' @param time factor specifying the groups
+#' @param subject factor specifying the subjects or the name of the subject column if a data.frame is used
+#' @param na.rm a logical value indicating if NA values should be removed
+#' @param formula optional formula object
+#' @param data optional data.frame of the data
+#' @param distribution either 'Chisq' or 'F' approximation
+#' @param ... further arguments are ignored
+#' @return Returns an object of class 'pseudorank'
+#' @example R/example_3.txt
+#' @references James L. Kepner & David H. Robinson (1988) Nonparametric Methods for Detecting Treatment Effects in Repeated-Measures Designs, Journal of the American Statistical Association, 83:402, 456-461.
+#' @keywords internal
+kepner_robinson_test <- function(x, ...) {
+  UseMethod("kepner_robinson_test")
+}
+
+#' @method kepner_robinson_test numeric
+#' @rdname kepner_robinson_test
+#' @keywords internal
+kepner_robinson_test.numeric <- function(x, time, subject, na.rm = FALSE, distribution = c("Chisq", "F"), ...) {
+  distribution = match.arg(distribution)
+  return(kepner_robinson_test_internal(data=x, time=as.factor(time), subject=as.factor(subject), na.rm = na.rm, distribution = distribution, formula = NULL, ...))
+}
+
+#' @method kepner_robinson_test formula
+#' @rdname kepner_robinson_test
+#' @keywords internal
+kepner_robinson_test.formula <- function(formula, data, subject, na.rm = FALSE, distribution = c("Chisq", "F"), ...) {
+  stopifnot(is.character(subject))
+  distribution = match.arg(distribution)
+  model <- model.frame(formula, data = data, na.action = NULL)
+  model$subject <- data[, subject]
+  colnames(model) <- c("data", "time", "subject")
+  return(kepner_robinson_test_internal(data=model$data, time=as.factor(model$time), subject=as.factor(model$subject), na.rm = na.rm, distribution = distribution, formula = formula, ...))
+}
+
+
+
+
+
 #' @keywords export
 print.pseudorank <- function(x, ...) {
   cat(x$name)
@@ -141,13 +206,17 @@ print.pseudorank <- function(x, ...) {
     }
   }
   cat("Test Statistic: ", x$test, "\n")
+  cat("Distribution of Statistic: ", x$distribution, "\n")
+  if(!is.null(x$df)) {
+    cat("Degrees of Freedom: ", paste(x$df,collapse=", "), "\n")
+  }
   cat("unweighted relative Effects / Pseudo-ranks: ", x$pseudoranks)
   cat("\n")
   cat("p-Value: ", x$pValue, "\n")
-  cat("\n")
-  cat("Descriptive:\n")
-  df <- data.frame(n = x$ss, p = x$pHat)
-  print(df, row.names = FALSE)
+  # cat("\n")
+  # cat("Descriptive:\n")
+  # df <- data.frame(n = x$ss, p = x$pHat)
+  # print(df, row.names = FALSE)
 }
 
 #' @keywords export
@@ -166,6 +235,10 @@ summary.pseudorank <- function(object, ...) {
     }
   }
   cat("Test Statistic: ", object$test, "\n")
+  cat("Distribution of Statistic: ", object$distribution, "\n")
+  if(!is.null(object$df)) {
+    cat("Degrees of Freedom: ", paste(object$df,collapse=", "), "\n")
+  }
   cat("unweighted relative Effects / Pseudo-ranks: ", object$pseudoranks)
   cat("\n")
   cat("p-Value: ", object$pValue, "\n")
