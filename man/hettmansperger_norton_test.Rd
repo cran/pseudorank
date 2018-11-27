@@ -12,9 +12,9 @@ hettmansperger_norton_test(x, ...)
   alternative = c("decreasing", "increasing", "custom"), trend = NULL,
   pseudoranks = TRUE, ...)
 
-\method{hettmansperger_norton_test}{formula}(formula, data, na.rm = FALSE,
-  alternative = c("decreasing", "increasing", "custom"), trend = NULL,
-  pseudoranks = TRUE, ...)
+\method{hettmansperger_norton_test}{formula}(formula, data,
+  na.rm = FALSE, alternative = c("decreasing", "increasing", "custom"),
+  trend = NULL, pseudoranks = TRUE, ...)
 }
 \arguments{
 \item{x}{vector containing the observations}

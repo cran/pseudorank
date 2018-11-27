@@ -8,8 +8,8 @@
 \usage{
 pseudorank(x, ...)
 
-\method{pseudorank}{numeric}(x, y, na.last = NA, ties.method = c("average",
-  "max", "min"), ...)
+\method{pseudorank}{numeric}(x, y, na.last = NA,
+  ties.method = c("average", "max", "min"), ...)
 
 \method{pseudorank}{formula}(formula, data, na.last = NA,
   ties.method = c("average", "max", "min"), ...)

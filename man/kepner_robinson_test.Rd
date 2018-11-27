@@ -11,8 +11,8 @@ kepner_robinson_test(x, ...)
 \method{kepner_robinson_test}{numeric}(x, time, subject, na.rm = FALSE,
   distribution = c("Chisq", "F"), ...)
 
-\method{kepner_robinson_test}{formula}(formula, data, subject, na.rm = FALSE,
-  distribution = c("Chisq", "F"), ...)
+\method{kepner_robinson_test}{formula}(formula, data, subject,
+  na.rm = FALSE, distribution = c("Chisq", "F"), ...)
 }
 \arguments{
 \item{x}{numeric vector containing the data}
