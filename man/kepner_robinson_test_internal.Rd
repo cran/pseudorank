@@ -17,17 +17,17 @@ kepner_robinson_test_internal(
 \arguments{
 \item{data}{numeric vector containing the data}
 
+\item{time}{factor vector containing time points}
+
+\item{subject}{factor vector containing subjects}
+
+\item{distribution}{specified distribution, either Chisq or F}
+
 \item{na.rm}{a logical value indicating if NA values should be removed}
 
 \item{formula}{formula object}
 
 \item{...}{further arguments are ignored}
-
-\item{group}{ordered factor vector for the groups}
-
-\item{alternative}{either decreasing or increasing}
-
-\item{trend}{custom numeric vector indicating the trend for the custom alternative, only used if alternative = "custom"}
 }
 \value{
 Returns a data.frame with the results
@@ -36,11 +36,14 @@ Returns a data.frame with the results
 This function calculates the Kepner-Robinsin test under the null hypothesis H0F: F_1 = ... F_k.
 }
 \examples{
-x = c(1, 1, 1, 1, 2, 3, 4, 5, 6)
-grp = as.factor(c('A','A','B','B','B','D','D','D','D'))
+# create some artificial data with 20 subjects measured at two time points
+data <- rnorm(40)
+time <- rep(c(1,2),20)
+subject <- gl(20,2)
+df <- data.frame(data=data,time=time,subject=subject)
 
-# calculate Kruskal-Wallis test using pseudo-ranks
-kruskal_wallis_test(x, grp, na.rm = FALSE, pseudoranks = TRUE)
+kepner_robinson_test(data,time,subject)
+kepner_robinson_test(data~time,data=df,subject="subject")
 }
 \references{
 Kepner, J. L., & Robinson, D. H. (1988). Nonparametric methods for detecting treatment effects in repeated-measures designs. Journal of the American Statistical Association, 83(402), 456-461.
